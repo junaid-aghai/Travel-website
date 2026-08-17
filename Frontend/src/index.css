@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Unified Brand Palette */
+  --primary: #0284C7;
+  --primary-hover: #0369A1;
+  --secondary: #D97706;
+  --secondary-light: #F59E0B;
+  --dark-navy: #0F172A;
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-body: #475569;
+  --text-secondary: #64748B;
+  --border: #E2E8F0;
+  --footer-bg: #0F172A;
+  --overlay-dark: linear-gradient(to top, rgba(15,23,42,0.75), rgba(15,23,42,0.25), transparent);
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --card-shadow-hover: 0 12px 30px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--background);
+  color: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Image Color Grading (Unified Visual Treatment across all images) */
+img.graded-img,
+.graded-img img,
+.destination-box img,
+.story-image-box img,
+.about-story-image img,
+.about-why-image img {
+  filter: contrast(1.03) saturate(0.92) brightness(0.98);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+}
+
+/* Image Overlay standard rule */
+.img-overlay-dark {
+  background: linear-gradient(
+    to top,
+    rgba(15, 23, 42, 0.70),
+    rgba(15, 23, 42, 0.20),
+    transparent
+  );
+}
+
+/* Common Brand Highlight */
+.highlight {
+  color: var(--secondary) !important;
+}
+
+/* Smooth Fade animations */
+.fade-up {
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
