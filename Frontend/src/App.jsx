@@ -1,25 +1,35 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import 'remixicon/fonts/remixicon.css';
+import { useAuth } from './hooks/useAuth';
+import api from './api/axios';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ToastContainer from './components/ui/Toast';
 import Home from './pages/Home';
-import About from './pages/About';
-import Testimonials from './pages/Testimonials';
-import Destinations from './pages/Destinations';
-import SignIn from './auth/SignIn';
-import SignUp from './auth/SignUp';
-import Admin from './pages/Admin';
-import DestinationDetail from './pages/DestinationDetail';
-import MyBookings from './pages/MyBookings';
+
+// Lazy-loaded routes for better performance
+const About = lazy(() => import('./pages/About'));
+const Testimonials = lazy(() => import('./pages/Testimonials'));
+const Destinations = lazy(() => import('./pages/Destinations'));
+const SignIn = lazy(() => import('./auth/SignIn'));
+const SignUp = lazy(() => import('./auth/SignUp'));
+const Admin = lazy(() => import('./pages/Admin'));
+const DestinationDetail = lazy(() => import('./pages/DestinationDetail'));
+const MyBookings = lazy(() => import('./pages/MyBookings'));
 
 import './App.css';
 
-// Protected route wrapper component for admin role
-const ProtectedAdminRoute = ({ user, loading, children }) => {
+// Protected route wrapper for admin role
+const ProtectedAdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>Loading...</div>;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <div className="detail-loading-spinner"></div>
+      </div>
+    );
   }
   if (!user || user.role !== 'admin') {
     return <Navigate to="/" replace />;
@@ -27,42 +37,23 @@ const ProtectedAdminRoute = ({ user, loading, children }) => {
   return children;
 };
 
+// Page loading fallback for Suspense
+const PageLoader = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+    <div className="detail-loading-spinner"></div>
+  </div>
+);
+
 const App = () => {
   const [destinationList, setDestinationList] = useState([]);
-  const [user, setUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true);
   const location = useLocation();
+
 
   const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup';
 
-  // Check logged in user state on mount / route change
-  const checkAuth = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/me', { withCredentials: true });
-      if (response.data.success) {
-        setUser(response.data.user);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        setAuthLoading(false);
-        return;
-      }
-    } catch (err) {
-      // Fallback check localStorage if server session endpoint fails
-      const savedUser = localStorage.getItem('user');
-      if (savedUser) {
-        try {
-          setUser(JSON.parse(savedUser));
-          setAuthLoading(false);
-          return;
-        } catch (e) { }
-      }
-    }
-    setUser(null);
-    setAuthLoading(false);
-  };
-
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/national");
+      const response = await api.get("/national");
       setDestinationList(response.data.destination || []);
     } catch (error) {
       console.error("Error fetching destinations:", error);
@@ -71,38 +62,40 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
-    checkAuth();
   }, []);
 
-  // Scroll to top of page whenever route changes
+  // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
   return (
     <>
-      <Navbar user={user} setUser={setUser} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path='/destinations'
-          element={<Destinations destinationList={destinationList} />}
-        />
-        <Route path='/about' element={<About />} />
-        <Route path='/testimonials' element={<Testimonials />} />
-        <Route path='/destination/:id' element={<DestinationDetail user={user} />} />
-        <Route path='/my-bookings' element={<MyBookings user={user} />} />
-        <Route path='/signin' element={<SignIn onLoginSuccess={checkAuth} />} />
-        <Route path='/signup' element={<SignUp onLoginSuccess={checkAuth} />} />
-        <Route
-          path='/admin'
-          element={
-            <ProtectedAdminRoute user={user} loading={authLoading}>
-              <Admin destinationList={destinationList} refreshDestinations={fetchData} />
-            </ProtectedAdminRoute>
-          }
-        />
-      </Routes>
+      <Navbar />
+      <ToastContainer />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path='/destinations'
+            element={<Destinations destinationList={destinationList} />}
+          />
+          <Route path='/about' element={<About />} />
+          <Route path='/testimonials' element={<Testimonials />} />
+          <Route path='/destination/:id' element={<DestinationDetail />} />
+          <Route path='/my-bookings' element={<MyBookings />} />
+          <Route path='/signin' element={<SignIn />} />
+          <Route path='/signup' element={<SignUp />} />
+          <Route
+            path='/admin'
+            element={
+              <ProtectedAdminRoute>
+                <Admin destinationList={destinationList} refreshDestinations={fetchData} />
+              </ProtectedAdminRoute>
+            }
+          />
+        </Routes>
+      </Suspense>
       {!isAuthPage && <Footer />}
     </>
   );

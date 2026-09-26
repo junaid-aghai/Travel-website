@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import '../App.css';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
+import api from '../api/axios';
 
-const MyBookings = ({ user }) => {
+
+const MyBookings = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterTab, setFilterTab] = useState('all');
@@ -12,7 +16,6 @@ const MyBookings = ({ user }) => {
   const [cancelModalBooking, setCancelModalBooking] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
   const [cancelLoading, setCancelLoading] = useState(false);
-  const [toast, setToast] = useState({ type: '', text: '' });
 
   useEffect(() => {
     if (!user) {
@@ -26,15 +29,13 @@ const MyBookings = ({ user }) => {
     setLoading(true);
     try {
       const emailQuery = user?.email ? `?email=${encodeURIComponent(user.email)}` : '';
-      const response = await axios.get(`http://localhost:8080/my-bookings${emailQuery}`, {
-        withCredentials: true
-      });
+      const response = await api.get(`/my-bookings${emailQuery}`);
       if (response.data.success) {
         setBookings(response.data.bookings || []);
       }
     } catch (err) {
       console.error('Error fetching bookings:', err);
-      setToast({ type: 'error', text: 'Could not load your bookings. Please try again.' });
+      toast.error('Could not load your bookings. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -43,27 +44,25 @@ const MyBookings = ({ user }) => {
   const handleCancelBooking = async () => {
     if (!cancelModalBooking) return;
     setCancelLoading(true);
-    setToast({ type: '', text: '' });
 
     try {
       const bId = cancelModalBooking._id;
-      const response = await axios.patch(
-        `http://localhost:8080/booking/cancel/${bId}`,
-        { reason: cancelReason },
-        { withCredentials: true }
+      const response = await api.patch(
+        `/booking/cancel/${bId}`,
+        { reason: cancelReason }
       );
 
       if (response.data.success) {
-        setToast({ type: 'success', text: response.data.message || 'Booking cancelled successfully.' });
+        toast.success(response.data.message || 'Booking cancelled successfully.');
         setCancelModalBooking(null);
         setCancelReason('');
         fetchMyBookings();
       } else {
-        setToast({ type: 'error', text: response.data.message || 'Failed to cancel reservation.' });
+        toast.error(response.data.message || 'Failed to cancel reservation.');
       }
     } catch (err) {
       console.error('Cancel booking error:', err);
-      setToast({ type: 'error', text: 'Server error while cancelling reservation.' });
+      toast.error('Server error while cancelling reservation.');
     } finally {
       setCancelLoading(false);
     }
@@ -127,16 +126,6 @@ const MyBookings = ({ user }) => {
           </div>
         </div>
       </div>
-
-      {toast.text && (
-        <div className={`admin-toast ${toast.type === 'error' ? 'toast-error' : 'toast-success'}`} style={{ maxWidth: '700px', margin: '20px auto' }}>
-          <i className={toast.type === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line'}></i>
-          <span>{toast.text}</span>
-          <button className="toast-close" onClick={() => setToast({ type: '', text: '' })}>
-            <i className="ri-close-line"></i>
-          </button>
-        </div>
-      )}
 
       {/* Main Content Area */}
       <div className="my-bookings-container">
@@ -279,7 +268,6 @@ const MyBookings = ({ user }) => {
             </div>
 
             <div className="printable-voucher-body" id="printable-voucher">
-              {/* Voucher Ticket UI */}
               <div className="ticket-container">
                 <div className="ticket-header">
                   <div className="ticket-brand">
@@ -325,7 +313,6 @@ const MyBookings = ({ user }) => {
                   </div>
                 </div>
 
-                {/* Perforation Divider */}
                 <div className="ticket-perforation">
                   <span className="notch-left"></span>
                   <span className="dash-line"></span>
@@ -389,10 +376,12 @@ const MyBookings = ({ user }) => {
                   width: '100%',
                   padding: '10px 14px',
                   borderRadius: '8px',
-                  border: '1px solid #cbd5e1',
+                  border: '1px solid var(--border)',
                   marginTop: '6px',
                   fontFamily: 'inherit',
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  background: 'var(--background)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>

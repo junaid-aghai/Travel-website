@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Unified Brand Palette */
+  /* Unified Brand Palette — Light Mode */
   --primary: #0284C7;
   --primary-hover: #0369A1;
   --secondary: #D97706;
@@ -19,6 +19,183 @@
   --card-shadow-hover: 0 12px 30px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
 }
 
+/* =============================================
+   Dark Mode — CSS Custom Property Overrides
+   ============================================= */
+[data-theme="dark"] {
+  --primary: #38BDF8;
+  --primary-hover: #0EA5E9;
+  --secondary: #FBBF24;
+  --secondary-light: #FDE68A;
+  --dark-navy: #0B1120;
+  --background: #0F172A;
+  --surface: #1E293B;
+  --text-primary: #F1F5F9;
+  --text-body: #CBD5E1;
+  --text-secondary: #94A3B8;
+  --border: #334155;
+  --footer-bg: #020617;
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25), 0 2px 6px -1px rgba(0, 0, 0, 0.15);
+  --card-shadow-hover: 0 12px 30px -4px rgba(0, 0, 0, 0.4), 0 4px 12px -2px rgba(0, 0, 0, 0.25);
+}
+
+/* Dark mode-specific overrides for elements that use hardcoded colors */
+[data-theme="dark"] body {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] nav.navbar {
+  background-color: rgba(15, 23, 42, 0.92);
+  border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] nav .logo a {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .home-form {
+  background: var(--surface);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .home-form input {
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .home-form input:focus {
+  background: var(--surface);
+}
+
+[data-theme="dark"] .booking-card {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border);
+}
+
+[data-theme="dark"] .booking-field input[type="date"] {
+  background: var(--background);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .booking-field input[type="date"]:focus {
+  background: var(--surface);
+}
+
+[data-theme="dark"] .persons-selector {
+  background: var(--background);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .booking-summary {
+  background: var(--background);
+}
+
+[data-theme="dark"] .auth-card {
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border);
+}
+
+[data-theme="dark"] .input-with-icon input {
+  background: var(--background);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .input-with-icon input:focus {
+  background: var(--surface);
+}
+
+[data-theme="dark"] .user-profile-btn {
+  background-color: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .user-dropdown-card {
+  background-color: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
+}
+
+[data-theme="dark"] .itinerary-card,
+[data-theme="dark"] .itinerary-day-form,
+[data-theme="dark"] .review-form-card,
+[data-theme="dark"] .admin-form input,
+[data-theme="dark"] .admin-form textarea,
+[data-theme="dark"] .admin-search-input input,
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group textarea {
+  background: var(--background);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .admin-table th {
+  background: var(--background);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .admin-table td {
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .admin-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.04);
+}
+
+[data-theme="dark"] .destinations-search-bar input {
+  background: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .star-rating-picker {
+  background: var(--background);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .booking-card-details {
+  background: var(--background);
+}
+
+[data-theme="dark"] .highlight-tag {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--primary);
+}
+
+[data-theme="dark"] .itinerary-builder {
+  background: var(--background);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .newsletter-form input {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .user-booking-card.booking-cancelled-card {
+  background: var(--background);
+}
+
+[data-theme="dark"] .voucher-modal-card,
+[data-theme="dark"] .cancel-modal-card {
+  background: var(--surface);
+}
+
+[data-theme="dark"] .ticket-container {
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .ticket-main-grid {
+  background: var(--background);
+}
+
+[data-theme="dark"] .ticket-col h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .ticket-footer-row {
+  background: var(--background);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -32,6 +209,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -84,5 +262,180 @@ img.graded-img,
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  font-size: 24px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.mobile-menu-btn:hover {
+  background: var(--background);
+}
+
+/* Mobile Drawer */
+.mobile-drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1001;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-drawer-overlay.open {
+  display: block;
+  opacity: 1;
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 300px;
+  max-width: 85vw;
+  height: 100vh;
+  background: var(--surface);
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+  transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.mobile-drawer.open {
+  right: 0;
+}
+
+.mobile-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-drawer-header h3 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.mobile-drawer-header h3 span {
+  color: var(--primary);
+}
+
+.mobile-drawer-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--background);
+  color: var(--text-primary);
+  font-size: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-drawer-nav {
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-drawer-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-body);
+  transition: all 0.2s;
+}
+
+.mobile-drawer-nav a:hover,
+.mobile-drawer-nav a.active {
+  background: rgba(2, 132, 199, 0.06);
+  color: var(--primary);
+}
+
+.mobile-drawer-nav a i {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+.mobile-drawer-footer {
+  margin-top: auto;
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Responsive: show hamburger, hide desktop nav */
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none !important;
+  }
+
+  .nav-auth-buttons .btn-secondary,
+  .nav-auth-buttons .btn-primary {
+    display: none;
+  }
+
+  .nav-auth-buttons .user-profile-menu {
+    display: none;
+  }
+
+  nav.navbar {
+    padding: 0 16px;
   }
 }

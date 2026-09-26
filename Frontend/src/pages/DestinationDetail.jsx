@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import '../App.css';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
+import api from '../api/axios';
 
-const DestinationDetail = ({ user }) => {
+
+const DestinationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [destination, setDestination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [persons, setPersons] = useState(1);
@@ -16,7 +20,7 @@ const DestinationDetail = ({ user }) => {
   useEffect(() => {
     const fetchDestination = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/destination/${id}`);
+        const response = await api.get(`/destination/${id}`);
         if (response.data.success) {
           setDestination(response.data.destination);
         }
@@ -33,6 +37,7 @@ const DestinationDetail = ({ user }) => {
 
   const handleBooking = async () => {
     if (!user) {
+      toast.warning('Please sign in to book this trip.');
       navigate('/signin');
       return;
     }
@@ -46,7 +51,7 @@ const DestinationDetail = ({ user }) => {
     setBookingMessage({ type: '', text: '' });
 
     try {
-      const response = await axios.post('http://localhost:8080/book', {
+      const response = await api.post('/book', {
         destinationId: destination._id,
         destinationName: destination.location,
         userName: user.name,
@@ -55,10 +60,11 @@ const DestinationDetail = ({ user }) => {
         pricePerPerson: destination.price,
         totalPrice,
         travelDate
-      }, { withCredentials: true });
+      });
 
       if (response.data.success) {
         setBookingMessage({ type: 'success', text: 'Booking confirmed! Check your email for details.' });
+        toast.success(`Booking for ${destination.location} submitted successfully!`);
         setTravelDate('');
         setPersons(1);
       } else {
@@ -67,6 +73,7 @@ const DestinationDetail = ({ user }) => {
     } catch (err) {
       console.error('Booking error:', err);
       setBookingMessage({ type: 'error', text: 'Server error. Please try again.' });
+      toast.error('Failed to submit booking. Please try again.');
     } finally {
       setBookingLoading(false);
     }

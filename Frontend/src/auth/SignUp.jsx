@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import '../App.css';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
+import api from '../api/axios';
 
-const SignUp = ({ onLoginSuccess }) => {
+
+const SignUp = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -13,6 +15,8 @@ const SignUp = ({ onLoginSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
+  const { toast } = useToast();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,19 +35,19 @@ const SignUp = ({ onLoginSuccess }) => {
       return;
     }
 
-
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/signup', {
+      const response = await api.post('/signup', {
         name: formData.fullName,
         email: formData.email,
         password: formData.password,
-      }, { withCredentials: true });
+      });
 
       if (response.data.success) {
         localStorage.setItem('user', JSON.stringify(response.data.user || { name: formData.fullName, email: formData.email }));
-        if (onLoginSuccess) await onLoginSuccess();
+        await checkAuth();
+        toast.success('Account created successfully! Welcome to TravelKro.');
         navigate('/');
       } else {
         setError(response.data.message || 'Registration failed');

@@ -1,198 +1,192 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import '../App.css';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import ThemeToggle from './ui/ThemeToggle';
 
-const Navbar = ({ user, setUser }) => {
-  const location = useLocation();
+
+const Navbar = () => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const location = useLocation();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when route changes
-  useEffect(() => {
-    setDropdownOpen(false);
-  }, [location.pathname]);
+  const isAdmin = user && user.role === 'admin';
 
   // Close dropdown on outside click
   useEffect(() => {
-    const handleOutsideClick = (e) => {
+    const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false);
+        setShowDropdown(false);
       }
     };
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when drawer is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
     }
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [dropdownOpen]);
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
 
   const handleLogout = async () => {
-    try {
-      await axios.post('http://localhost:8080/logout', {}, { withCredentials: true });
-    } catch (e) {
-      console.error('Logout error:', e);
-    }
-    localStorage.removeItem('user');
-    setUser(null);
-    setDropdownOpen(false);
+    await logout();
+    setShowDropdown(false);
+    setMobileOpen(false);
     navigate('/');
   };
 
   const getInitial = () => {
-    if (!user || !user.name) return 'U';
-    return user.name.charAt(0).toUpperCase();
+    if (user?.name) return user.name.charAt(0).toUpperCase();
+    if (user?.email) return user.email.charAt(0).toUpperCase();
+    return 'U';
   };
 
   return (
-    <nav className="navbar">
-      <div className='logo'>
-        <Link to="/">Travel<span>Kro</span></Link>
-      </div>
-      <div className='nav-links'>
-        <ul>
-          <li>
-            <Link to="/" className={location.pathname === '/' ? 'active' : ''}>Home</Link>
-          </li>
-          <li>
-            <Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>About</Link>
-          </li>
-          <li>
-            <Link to="/destinations" className={location.pathname === '/destinations' ? 'active' : ''}>Destinations</Link>
-          </li>
-          <li>
-            <Link to="/testimonials" className={location.pathname === '/testimonials' ? 'active' : ''}>Testimonials</Link>
-          </li>
-          {user && user.role === 'admin' && (
-            <li>
-              <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''}>Admin</Link>
-            </li>
-          )}
-        </ul>
-      </div>
+    <>
+      <nav className="navbar" role="navigation" aria-label="Main navigation">
+        <div className="logo">
+          <Link to="/">Travel<span>Kro</span></Link>
+        </div>
 
-      <div className="nav-auth-buttons">
-        {user ? (
-          <div className="user-profile-menu" ref={dropdownRef} style={{ position: 'relative' }}>
-            <button
-              className="user-profile-btn"
-              aria-expanded={dropdownOpen}
-              aria-label="User account menu"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                background: '#f1f5f9',
-                border: '1px solid #e2e8f0',
-                padding: '6px 14px 6px 6px',
-                borderRadius: '50px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <div
-                className="user-avatar-circle"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  backgroundColor: '#0284c7',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '700',
-                  fontSize: '16px',
-                  boxShadow: '0 2px 6px rgba(2, 132, 199, 0.3)'
-                }}
-              >
-                {getInitial()}
-              </div>
-              <span
-                className="user-name-text"
-                style={{
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  color: '#0f172a'
-                }}
-              >
-                {user.name || user.email?.split('@')[0]}
-              </span>
-              <i className={`ri-arrow-down-s-line ${dropdownOpen ? 'rotate-180' : ''}`} style={{ transition: 'transform 0.2s ease' }}></i>
-            </button>
+        {/* Desktop Navigation */}
+        <div className="nav-links">
+          <ul>
+            <li><NavLink to="/" end>Home</NavLink></li>
+            <li><NavLink to="/destinations">Destinations</NavLink></li>
+            <li><NavLink to="/about">About</NavLink></li>
+            <li><NavLink to="/testimonials">Testimonials</NavLink></li>
+            {isAdmin && <li><NavLink to="/admin">Admin</NavLink></li>}
+          </ul>
+        </div>
 
-            {dropdownOpen && (
-              <div
-                className="user-dropdown-card"
-                style={{
-                  position: 'absolute',
-                  top: '50px',
-                  right: '0',
-                  backgroundColor: '#ffffff',
-                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-                  borderRadius: '12px',
-                  padding: '8px 0',
-                  minWidth: '180px',
-                  zIndex: 100,
-                  border: '1px solid #f1f5f9'
-                }}
+        {/* Right side: theme toggle + auth + hamburger */}
+        <div className="nav-auth-buttons">
+          <ThemeToggle />
+
+          {user ? (
+            <div className="user-profile-menu" ref={dropdownRef}>
+              <button
+                type="button"
+                className={`user-profile-btn ${showDropdown ? 'active' : ''}`}
+                onClick={() => setShowDropdown(prev => !prev)}
+                aria-expanded={showDropdown}
+                aria-haspopup="true"
+                id="user-profile-menu-button"
               >
-                <div style={{ padding: '8px 16px', borderBottom: '1px solid #f1f5f9' }}>
-                  <p style={{ margin: 0, fontWeight: '700', fontSize: '14px', color: '#0f172a' }}>{user.name || 'User'}</p>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#64748b', wordBreak: 'break-all' }}>{user.email}</p>
+                <span className="user-avatar-circle">{getInitial()}</span>
+                <span className="user-name-text">{user.name || user.email?.split('@')[0]}</span>
+                <i className={`ri-arrow-${showDropdown ? 'up' : 'down'}-s-line profile-chevron`}></i>
+              </button>
+              {showDropdown && (
+                <div className="user-dropdown-card" role="menu" aria-orientation="vertical">
+                  <div className="user-dropdown-header">
+                    <span className="user-avatar-circle large">{getInitial()}</span>
+                    <div className="user-dropdown-user-info">
+                      <p className="user-dropdown-name">{user.name || 'User'}</p>
+                      <p className="user-dropdown-email">{user.email}</p>
+                    </div>
+                  </div>
+                  <div className="user-dropdown-divider"></div>
+                  <div className="user-dropdown-items">
+                    <Link to="/my-bookings" className="dropdown-item-link" onClick={() => setShowDropdown(false)} role="menuitem">
+                      <i className="ri-ticket-2-line"></i>
+                      <span>My Bookings</span>
+                    </Link>
+                    {isAdmin && (
+                      <Link to="/admin" className="dropdown-item-link" onClick={() => setShowDropdown(false)} role="menuitem">
+                        <i className="ri-dashboard-line"></i>
+                        <span>Admin Dashboard</span>
+                      </Link>
+                    )}
+                    <button type="button" className="dropdown-item-link dropdown-logout-btn" onClick={handleLogout} role="menuitem">
+                      <i className="ri-logout-box-r-line"></i>
+                      <span>Logout</span>
+                    </button>
+                  </div>
                 </div>
-                <Link
-                  to="/my-bookings"
-                  onClick={() => setDropdownOpen(false)}
-                  style={{
-                    padding: '10px 16px',
-                    textAlign: 'left',
-                    color: '#0f172a',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    borderBottom: '1px solid #f8fafc',
-                    transition: 'background 0.15s ease'
-                  }}
-                  className="dropdown-item-link"
-                >
-                  <i className="ri-ticket-2-line" style={{ color: '#0284c7', fontSize: '16px' }}></i> My Bookings
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    width: '100%',
-                    padding: '10px 16px',
-                    textAlign: 'left',
-                    background: 'none',
-                    border: 'none',
-                    color: '#ef4444',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  <i className="ri-logout-box-r-line"></i> Logout
-                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              <Link to="/signin" className="btn-secondary">Sign In</Link>
+              <Link to="/signup" className="btn-primary">Sign Up</Link>
+            </>
+          )}
+
+          {/* Mobile hamburger button */}
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
+          >
+            <i className="ri-menu-3-line"></i>
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Drawer Overlay */}
+      <div
+        className={`mobile-drawer-overlay ${mobileOpen ? 'open' : ''}`}
+        onClick={() => setMobileOpen(false)}
+      />
+
+      {/* Mobile Drawer */}
+      <div className={`mobile-drawer ${mobileOpen ? 'open' : ''}`} role="dialog" aria-modal="true">
+        <div className="mobile-drawer-header">
+          <h3>Travel<span>Kro</span></h3>
+          <button
+            className="mobile-drawer-close"
+            onClick={() => setMobileOpen(false)}
+            aria-label="Close menu"
+          >
+            <i className="ri-close-line"></i>
+          </button>
+        </div>
+
+        <nav className="mobile-drawer-nav" aria-label="Mobile navigation">
+          <NavLink to="/" end><i className="ri-home-4-line"></i> Home</NavLink>
+          <NavLink to="/destinations"><i className="ri-map-pin-line"></i> Destinations</NavLink>
+          <NavLink to="/about"><i className="ri-information-line"></i> About</NavLink>
+          <NavLink to="/testimonials"><i className="ri-chat-quote-line"></i> Testimonials</NavLink>
+          {user && <NavLink to="/my-bookings"><i className="ri-ticket-2-line"></i> My Bookings</NavLink>}
+          {isAdmin && <NavLink to="/admin"><i className="ri-dashboard-line"></i> Admin Dashboard</NavLink>}
+        </nav>
+
+        <div className="mobile-drawer-footer">
+          {user ? (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <span className="user-avatar-circle" style={{ width: '36px', height: '36px', fontSize: '15px' }}>{getInitial()}</span>
+                <div>
+                  <p style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>{user.name || 'User'}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{user.email}</p>
+                </div>
               </div>
-            )}
-          </div>
-        ) : (
-          <>
-            <Link to="/signin" className="btn-secondary">Sign In</Link>
-            <Link to="/signup" className="btn-primary">Sign Up</Link>
-          </>
-        )}
+              <button onClick={handleLogout} className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
+                <i className="ri-logout-box-r-line"></i> Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/signin" className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>Sign In</Link>
+              <Link to="/signup" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>Sign Up</Link>
+            </>
+          )}
+        </div>
       </div>
-    </nav>
+    </>
   );
 };
 

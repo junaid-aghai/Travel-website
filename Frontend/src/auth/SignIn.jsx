@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import '../App.css';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
+import api from '../api/axios';
 
-const SignIn = ({ onLoginSuccess }) => {
+
+const SignIn = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -11,6 +13,8 @@ const SignIn = ({ onLoginSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
+  const { toast } = useToast();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,14 +30,15 @@ const SignIn = ({ onLoginSuccess }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/signin', {
+      const response = await api.post('/signin', {
         email: formData.email,
         password: formData.password,
-      }, { withCredentials: true });
+      });
 
       if (response.data.success) {
         localStorage.setItem('user', JSON.stringify(response.data.user || { email: formData.email }));
-        if (onLoginSuccess) await onLoginSuccess();
+        await checkAuth();
+        toast.success('Welcome back! Signed in successfully.');
         navigate('/');
       } else {
         setError(response.data.message || 'Invalid email or password');
@@ -79,7 +84,7 @@ const SignIn = ({ onLoginSuccess }) => {
           <div className="form-group">
             <div className="label-row">
               <label htmlFor="password">Password</label>
-              <a href="#forgot" onClick={(e) => { e.preventDefault(); alert('Password reset link sent to your email!'); }} className="forgot-link">
+              <a href="#forgot" onClick={(e) => { e.preventDefault(); toast.info('Password reset link sent to your email!'); }} className="forgot-link">
                 Forgot password?
               </a>
             </div>

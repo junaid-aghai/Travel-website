@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import '../App.css';
+import { useSearchParams } from 'react-router-dom';
+import DestinationCard from '../components/DestinationCard';
+import { DestinationCardSkeleton } from '../components/ui/Skeleton';
+
 
 const Destinations = ({ destinationList }) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -8,7 +10,7 @@ const Destinations = ({ destinationList }) => {
   const [maxBudget, setMaxBudget] = useState('');
 
   useEffect(() => {
-    const q = searchParams.get('q');
+    const q = searchParams.get('q') || searchParams.get('search');
     const budget = searchParams.get('maxPrice');
     if (q) setSearchTerm(q);
     if (budget) setMaxBudget(budget);
@@ -24,11 +26,13 @@ const Destinations = ({ destinationList }) => {
     const matchesQuery = !searchTerm ||
       item.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.desc?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesBudget = !maxBudget || (item.price && Number(item.price) <= Number(maxBudget));
 
     return matchesQuery && matchesBudget;
   });
+
+  const isLoading = destinationList.length === 0;
 
   return (
     <div className='destinations-national'>
@@ -64,33 +68,11 @@ const Destinations = ({ destinationList }) => {
       </div>
 
       <div className='destinations-national-box'>
-        {filteredDestinations.length > 0 ? (
-          filteredDestinations.map((national) => (
-            <div className='destination-box' key={national._id || national.location}>
-              <div className="card-img-wrapper">
-                <img
-                  src={national.image || 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80'}
-                  alt={national.location}
-                />
-                <div className="card-img-overlay"></div>
-              </div>
-              <div className="card-body">
-                <p className='location'><i className="ri-map-pin-line"></i> {national.location}</p>
-                <p className='description'>{national.desc}</p>
-                <div className="rating-review-row">
-                  <span className="rating-badge">
-                    <i className="ri-star-fill"></i> {national.rating}
-                  </span>
-                  <span className='reviews-count'>({national.reviews} Reviews)</span>
-                </div>
-                <div className="price-booking-row">
-                  <h2>${national.price} <span>/ person</span></h2>
-                  <Link to={`/destination/${national._id}`} className='btn-primary'>
-                    Book <i className="ri-arrow-right-line"></i>
-                  </Link>
-                </div>
-              </div>
-            </div>
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => <DestinationCardSkeleton key={i} />)
+        ) : filteredDestinations.length > 0 ? (
+          filteredDestinations.map((dest) => (
+            <DestinationCard key={dest._id || dest.location} destination={dest} />
           ))
         ) : (
           <div className="no-results-box">

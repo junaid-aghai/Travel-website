@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import '../App.css';
+import api from '../api/axios';
+
 
 const Admin = ({ destinationList, refreshDestinations }) => {
   const [activeTab, setActiveTab] = useState('destinations');
@@ -41,7 +41,7 @@ const Admin = ({ destinationList, refreshDestinations }) => {
   const fetchBookings = async (isBackground = false) => {
     if (!isBackground) setBookingsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8080/bookings', { withCredentials: true });
+      const response = await api.get('/bookings');
       if (response.data.success) {
         setBookings(response.data.bookings);
       }
@@ -56,7 +56,7 @@ const Admin = ({ destinationList, refreshDestinations }) => {
     setConfirmLoading(bookingId);
     setMessage({ type: '', text: '' });
     try {
-      const response = await axios.post(`http://localhost:8080/booking/confirm/${bookingId}`, {}, { withCredentials: true });
+      const response = await api.post(`/booking/confirm/${bookingId}`);
       if (response.data.success) {
         setMessage({ type: 'success', text: response.data.message || 'Booking confirmed & user notified via email!' });
         fetchBookings(true);
@@ -129,7 +129,7 @@ const Admin = ({ destinationList, refreshDestinations }) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/submit', payload);
+      const response = await api.post('/submit', payload);
       if (response.data.success) {
         setMessage({ type: 'success', text: 'Destination created successfully!' });
         setFormData({ location: '', desc: '', price: '', rating: '4.8', reviews: '120', image: '' });
@@ -154,7 +154,7 @@ const Admin = ({ destinationList, refreshDestinations }) => {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await axios.delete(`http://localhost:8080/destination/${identifier}`);
+      const response = await api.delete(`/destination/${identifier}`);
       if (response.data.success) {
         setMessage({ type: 'success', text: `Deleted "${dest.location}" successfully!` });
         if (refreshDestinations) refreshDestinations();

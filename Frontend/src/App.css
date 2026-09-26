@@ -62,6 +62,207 @@ nav .logo a span {
   gap: 12px;
 }
 
+/* User Profile Dropdown in Navbar */
+.user-profile-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.user-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 14px 5px 6px;
+  background-color: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 9999px;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.user-profile-btn:hover,
+.user-profile-btn.active {
+  border-color: var(--primary);
+  background-color: rgba(2, 132, 199, 0.05);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+  transform: translateY(-1px);
+}
+
+.user-avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #2563EB);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.28);
+}
+
+.user-avatar-circle.large {
+  width: 42px;
+  height: 42px;
+  font-size: 16px;
+}
+
+.user-name-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.profile-chevron {
+  font-size: 16px;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.user-profile-btn:hover .profile-chevron,
+.user-profile-btn.active .profile-chevron {
+  color: var(--primary);
+}
+
+/* User Dropdown Floating Menu */
+.user-dropdown-card {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 250px;
+  max-width: 290px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.user-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 10px 10px;
+}
+
+.user-dropdown-user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.user-dropdown-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.user-dropdown-email {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 2px 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.user-dropdown-divider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 4px 4px 6px 4px;
+}
+
+.user-dropdown-items {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dropdown-item-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.dropdown-item-link i {
+  font-size: 17px;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+}
+
+.dropdown-item-link:hover {
+  background-color: rgba(2, 132, 199, 0.08);
+  color: var(--primary);
+}
+
+.dropdown-item-link:hover i {
+  color: var(--primary);
+}
+
+.dropdown-logout-btn {
+  color: #EF4444 !important;
+}
+
+.dropdown-logout-btn i {
+  color: #EF4444 !important;
+}
+
+.dropdown-logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  color: #DC2626 !important;
+}
+
+.dropdown-logout-btn:hover i {
+  color: #DC2626 !important;
+}
+
 /* Button Component Specs */
 .btn-primary {
   background-color: var(--primary);
@@ -250,9 +451,15 @@ nav .logo a span {
 
 .destinations-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 30px;
   justify-content: center;
+}
+
+@media (min-width: 992px) {
+  #destinations .destinations-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* Unified Card Component */
